@@ -10,7 +10,7 @@ class Enum
 
   def initialize(name, &definicion)
     @to_s = name
-    ComportamientoEnum.new(self, &definicion) unless definicion.nil?
+    ValorAbstracto.new(self, &definicion) unless definicion.nil?
   end
 
   def method_missing(name, *args, &block)
@@ -38,7 +38,7 @@ class ValorDeEnum
   end
 end
 
-class ComportamientoEnum
+class ValorAbstracto
   attr_accessor :enum
   def initialize(enum_instance, &definicion)
     self.enum = enum_instance
