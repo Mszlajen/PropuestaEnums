@@ -1,40 +1,69 @@
 class ValueIsNotIntegerError < Exception
 end
 
-class EnumCreator
-  attr_accessor :enum_instance, :counter, :enum_name, :enum_definition
+class InvalidEnumValueError < Exception
+end
+
+
+class Enum
+  attr_reader :to_s
+
   def initialize(name, &definicion)
-    self.enum_instance = Class.new
-    self.counter = 1
-    self.enum_name = name
-    self.enum_definition = definicion
-  end
-
-  def create()
-    self.instance_exec &enum_definition
-    Object.const_set(enum_name, enum_instance)
-  end
-
-  def create_class_for_value(name, numeric_value)
-    nueva_clase = Class.new
-    enum_name = self.enum_name
-    nueva_clase.define_method(:valor) { numeric_value }
-    nueva_clase.define_method(:to_s) { "#{enum_name}.#{name}" }
-    nueva_clase
+    @to_s = name
+    ComportamientoEnum.new(self, &definicion) unless definicion.nil?
   end
 
   def method_missing(name, *args, &block)
+    raise InvalidEnumValueError
+  end
+end
+
+class ValorDeEnum
+  def initialize(valor, name, comportamiento)
+    @valor = valor
+    @name = name
+    @comportamiento = comportamiento
+  end
+
+  def valor
+    @valor
+  end
+
+  def to_s
+    "#{@comportamiento.enum.to_s}.#{@name}"
+  end
+
+  def method_missing(name, *args, &block)
+    @comportamiento.send(name, *args, &block)
+  end
+end
+
+class ComportamientoEnum
+  attr_accessor :enum
+  def initialize(enum_instance, &definicion)
+    self.enum = enum_instance
+    self.singleton_class.instance_variable_set("@max_value", 0)
+    self.singleton_class.instance_variable_set("@enum", enum_instance)
+    self.singleton_class.instance_variable_set("@instance", self)
+    self.singleton_class.instance_variable_set("@en_creacion", true)
+    self.singleton_class.class_exec &definicion
+    self.singleton_class.instance_variable_set("@en_creacion", false)
+  end
+
+  def self.method_missing(name, *args, &block)
+    return super unless @en_creacion
+
     if args[0].nil?
-      enum_value = create_class_for_value(name, counter).new
-      self.counter = self.counter + 1
+      @max_value += 1
     elsif args[0].is_a? Integer
-      enum_value = create_class_for_value(name, args[0]).new
-      self.counter = args[0] + 1
+      @max_value = args[0]
     else
       raise ValueIsNotIntegerError
     end
 
-    enum_instance.define_singleton_method(name) do
+    enum_value = ValorDeEnum.new(@max_value, name, @instance)
+    enum_value.singleton_class.class_exec &block unless block.nil?
+    @enum.define_singleton_method(name) do
       enum_value
     end
   end
