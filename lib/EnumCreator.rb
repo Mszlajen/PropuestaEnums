@@ -13,6 +13,10 @@ class Enum
     ValorAbstracto.new(self, &definicion) unless definicion.nil?
   end
 
+  def get_value(name)
+    self.send(name)
+  end
+
   def method_missing(name, *args, &block)
     raise InvalidEnumValueError
   end

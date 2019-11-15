@@ -7,6 +7,7 @@ RSpec.describe "test de enums" do
       valor1
       valor2
       valor4 4
+      valor5
     end
 
     it "igualdad" do
@@ -23,6 +24,10 @@ RSpec.describe "test de enums" do
 
     it "valor numerico cambiado" do
       expect(EnumBasico.valor4.valor).to be 4
+    end
+
+    it "valor numerico queda corrido" do
+      expect(EnumBasico.valor5.valor).to be 5
     end
 
     it "to_s" do
@@ -70,6 +75,22 @@ RSpec.describe "test de enums" do
     it "persona1 se despide diferente" do
       expect(EnumSaludadora.persona1.despedirse).to eq("adiosito")
       expect(EnumSaludadora.persona2.despedirse).to eq("adios")
+    end
+  end
+
+  context "get_value" do
+    enum :Valores do
+      primero
+      segundo
+      tercero
+    end
+
+    it "obtiene el valor" do
+      expect(Valores.get_value(:primero)).to be Valores.primero
+    end
+
+    it "rompe si no obtiene el valor" do
+      expect{ Valores.get_value(:negativo) }.to raise_error InvalidEnumValueError
     end
   end
 end
