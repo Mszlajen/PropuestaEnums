@@ -105,13 +105,22 @@ RSpec.describe "test de enums" do
         primero
         segundo
         tercero
+        quinto 5
       end
     end
 
     it "each" do
       list = []
       Valores.each { |valor| list << valor }
-      expect(list).to contain_exactly(Valores.primero, Valores.segundo, Valores.tercero)
+      expect(list).to contain_exactly(Valores.primero, Valores.segundo, Valores.tercero, Valores.quinto)
+    end
+
+    it "all?" do
+      expect(Valores.all? {|valor| valor.valor < 5}).to be false
+    end
+
+    it "any?" do
+      expect(Valores.any? {|valor| valor.valor < 5}).to be true
     end
   end
 

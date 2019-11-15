@@ -17,12 +17,16 @@ class Enum
     self.send(name)
   end
 
-  def each(&bloque)
-    @valorAbstracto.valores.each &bloque
+  def each(&block)
+    @valorAbstracto.valores.each &block
   end
 
   def method_missing(name, *args, &block)
-    raise InvalidEnumValueError
+    if Enumerable.method_defined? name
+      @valorAbstracto.valores.send(name, *args, &block)
+    else
+      raise InvalidEnumValueError
+    end
   end
 end
 
