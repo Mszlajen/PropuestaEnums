@@ -10,11 +10,15 @@ class Enum
 
   def initialize(name, &definicion)
     @to_s = name
-    ValorAbstracto.new(self, &definicion) unless definicion.nil?
+    @valorAbstracto = ValorAbstracto.new(self, &definicion)
   end
 
   def get_value(name)
     self.send(name)
+  end
+
+  def each(&bloque)
+    @valorAbstracto.valores.each &bloque
   end
 
   def method_missing(name, *args, &block)
@@ -43,14 +47,16 @@ class ValorDeEnum
 end
 
 class ValorAbstracto
-  attr_accessor :enum
+  attr_accessor :enum, :valores
   def initialize(enum_instance, &definicion)
     self.enum = enum_instance
+    self.valores = []
     self.singleton_class.instance_variable_set("@max_value", 0)
     self.singleton_class.instance_variable_set("@enum", enum_instance)
     self.singleton_class.instance_variable_set("@instance", self)
+    self.singleton_class.instance_variable_set("@valores", self.valores)
     self.singleton_class.instance_variable_set("@en_creacion", true)
-    self.singleton_class.class_exec &definicion
+    self.singleton_class.class_exec &definicion unless definicion.nil?
     self.singleton_class.instance_variable_set("@en_creacion", false)
   end
 
@@ -67,6 +73,7 @@ class ValorAbstracto
 
     enum_value = ValorDeEnum.new(@max_value, name, @instance)
     enum_value.singleton_class.class_exec &block unless block.nil?
+    @valores << enum_value
     @enum.define_singleton_method(name) do
       enum_value
     end

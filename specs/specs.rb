@@ -93,4 +93,18 @@ RSpec.describe "test de enums" do
       expect{ Valores.get_value(:negativo) }.to raise_error InvalidEnumValueError
     end
   end
+
+  context "polimorfismo con enumarable" do
+    enum :Valores do
+      primero
+      segundo
+      tercero
+    end
+
+    it "each" do
+      list = []
+      Valores.each { |valor| list << valor }
+      expect(list).to contain_exactly(Valores.primero, Valores.segundo, Valores.tercero)
+    end
+  end
 end
