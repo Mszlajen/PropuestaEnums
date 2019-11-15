@@ -1,1 +1,1 @@
-require_relative 'Object.rb'
+require_relative 'Module.rb'
