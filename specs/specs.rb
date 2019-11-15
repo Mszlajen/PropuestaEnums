@@ -3,11 +3,13 @@ require_relative '../lib/enum'
 
 RSpec.describe "test de enums" do
   context "Funcionalidad basica de enum" do
-    enum :EnumBasico do
-      valor1
-      valor2
-      valor4 4
-      valor5
+    class Object
+      enum :EnumBasico do
+        valor1
+        valor2
+        valor4 4
+        valor5
+      end
     end
 
     it "igualdad" do
@@ -50,20 +52,21 @@ RSpec.describe "test de enums" do
   end
 
   context "comportamiento" do
-    enum :EnumSaludadora do
-      persona1 do
-        def despedirse
-          "adiosito"
+    class Object
+      enum :EnumSaludadora do
+        persona1 do
+          def despedirse
+            "adiosito"
+          end
         end
-      end
-      persona2
+        persona2
 
-      def saludar
-        "hola"
-      end
-
-      def despedirse
-        "adios"
+        def saludar
+          "hola"
+        end
+        def despedirse
+          "adios"
+        end
       end
     end
 
@@ -79,10 +82,12 @@ RSpec.describe "test de enums" do
   end
 
   context "get_value" do
-    enum :Valores do
-      primero
-      segundo
-      tercero
+    class Object
+      enum :Valores do
+        primero
+        segundo
+        tercero
+      end
     end
 
     it "obtiene el valor" do
@@ -95,16 +100,32 @@ RSpec.describe "test de enums" do
   end
 
   context "polimorfismo con enumarable" do
-    enum :Valores do
-      primero
-      segundo
-      tercero
+    class Object
+      enum :Valores do
+        primero
+        segundo
+        tercero
+      end
     end
 
     it "each" do
       list = []
       Valores.each { |valor| list << valor }
       expect(list).to contain_exactly(Valores.primero, Valores.segundo, Valores.tercero)
+    end
+  end
+
+  context "Constante en contexto" do
+    class UnaClase
+      enum :MiEnum
+    end
+
+    it "MiEnum no existe en el contexto general" do
+      expect{MiEnum}.to raise_error NameError
+    end
+
+    it "MiEnum existe en el interior de UnaClase" do
+      expect{UnaClase::MiEnum}.not_to raise_error
     end
   end
 end
