@@ -6,6 +6,7 @@ end
 
 
 class Enum
+  include Enumerable
   attr_reader :to_s
 
   def initialize(name, &definicion)
@@ -22,11 +23,7 @@ class Enum
   end
 
   def method_missing(name, *args, &block)
-    if Enumerable.method_defined? name
-      @valorAbstracto.valores.send(name, *args, &block)
-    else
-      raise InvalidEnumValueError
-    end
+    raise InvalidEnumValueError
   end
 end
 
