@@ -22,6 +22,10 @@ class Enum
     @valorAbstracto.valores.each &block
   end
 
+  def modificar(&block)
+    @valorAbstracto.modificar(&block)
+  end
+
   def method_missing(name, *args, &block)
     raise InvalidEnumValueError
   end
@@ -51,11 +55,15 @@ class ValorAbstracto
   attr_accessor :enum, :valores
   def initialize(enum_instance, &definicion)
     self.enum = enum_instance
-    self.valores = []
+    self.valores = Hash.new
     self.singleton_class.instance_variable_set("@max_value", 0)
     self.singleton_class.instance_variable_set("@enum", enum_instance)
     self.singleton_class.instance_variable_set("@instance", self)
     self.singleton_class.instance_variable_set("@valores", self.valores)
+    self.modificar(&definicion)
+  end
+
+  def modificar(&definicion)
     self.singleton_class.instance_variable_set("@en_creacion", true)
     self.singleton_class.class_exec &definicion unless definicion.nil?
     self.singleton_class.instance_variable_set("@en_creacion", false)
@@ -74,7 +82,7 @@ class ValorAbstracto
 
     enum_value = ValorDeEnum.new(@max_value, name, @instance)
     enum_value.singleton_class.class_exec &block unless block.nil?
-    @valores << enum_value
+    @valores[name] = enum_value
     @enum.define_singleton_method(name) do
       enum_value
     end

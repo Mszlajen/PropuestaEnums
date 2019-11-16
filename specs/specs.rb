@@ -101,7 +101,7 @@ RSpec.describe "test de enums" do
 
   context "polimorfismo con enumarable" do
     class Object
-      enum :Valores do
+      enum :EnumPolimorfico do
         primero
         segundo
         tercero
@@ -111,16 +111,16 @@ RSpec.describe "test de enums" do
 
     it "each" do
       list = []
-      Valores.each { |valor| list << valor }
-      expect(list).to contain_exactly(Valores.primero, Valores.segundo, Valores.tercero, Valores.quinto)
+      EnumPolimorfico.each { |nombre, valor| list << valor }
+      expect(list).to contain_exactly(EnumPolimorfico.primero, EnumPolimorfico.segundo, EnumPolimorfico.tercero, EnumPolimorfico.quinto)
     end
 
     it "all?" do
-      expect(Valores.all? {|valor| valor.valor < 5}).to be false
+      expect(EnumPolimorfico.all? {|nombre, valor| valor.valor < 5}).to be false
     end
 
     it "any?" do
-      expect(Valores.any? {|valor| valor.valor < 5}).to be true
+      expect(EnumPolimorfico.any? {|nombre, valor| valor.valor < 5}).to be true
     end
   end
 
@@ -135,6 +135,29 @@ RSpec.describe "test de enums" do
 
     it "MiEnum existe en el interior de UnaClase" do
       expect{UnaClase::MiEnum}.not_to raise_error
+    end
+  end
+
+  context "Enum abiertos" do
+    class Object
+      enum :EnumAbierto do
+        valor do
+          def se_piso?
+            false
+          end
+        end
+        def se_piso?
+          true
+        end
+      end
+
+      enum :EnumAbierto do
+        valor
+      end
+    end
+
+    it "se piso es verdad" do
+      expect(EnumAbierto.valor.se_piso?).to be true
     end
   end
 end
