@@ -36,16 +36,17 @@ RSpec.describe "test de enums" do
       expect(EnumBasico.valor1.to_s).to eq "EnumBasico.valor1"
     end
 
-    #No sé hacer funcionar este test
-    xit "falla si cambio valor a algo no entero" do
+    it "falla si cambio valor a algo no entero" do
       proc = Proc.new do
-        enum :UnEnum do
-          valor "to_s"
+        class Object
+          enum :UnEnum do
+            valor "to_s"
+          end
         end
       end
       expect(&proc).to raise_error ValueIsNotIntegerError
-
     end
+
     it "falla si pido un valor que no existe" do
       expect {EnumBasico.valorInexistente}.to raise_error InvalidEnumValueError
     end
@@ -141,23 +142,57 @@ RSpec.describe "test de enums" do
   context "Enum abiertos" do
     class Object
       enum :EnumAbierto do
-        valor do
-          def se_piso?
+        falso do
+          def se_piso_valor?
             false
           end
         end
-        def se_piso?
+        falso_cambiado_a_verdadero do
+          def se_piso_valor?
+            false
+          end
+        end
+        verdadero
+        def se_piso_valor?
+          true
+        end
+
+        def se_piso_enum?
+          false
+        end
+
+      end
+
+      enum :EnumAbierto do
+        falso_cambiado_a_verdadero
+        valor_agregado
+
+        def se_piso_enum?
           true
         end
       end
 
-      enum :EnumAbierto do
-        valor
+      enum EnumAbierto do
+        def funciona_con_constante?
+        end
       end
     end
 
-    it "se piso es verdad" do
-      expect(EnumAbierto.valor.se_piso?).to be true
+    it "funciona con constante" do
+      expect{EnumAbierto.verdadero.funciona_con_constante?}.not_to raise_error
+    end
+
+    it "se agrego un nuevo valor" do
+      expect{EnumAbierto.valor_agregado}.not_to raise_error
+    end
+
+    it "se piso metodo de enum" do
+      expect(EnumAbierto.falso.se_piso_enum?).to be true
+      expect(EnumAbierto.verdadero.se_piso_enum?).to be true
+    end
+
+    it "se piso valor es verdad" do
+      expect(EnumAbierto.falso_cambiado_a_verdadero.se_piso_valor?).to be true
     end
   end
 end
