@@ -19,7 +19,7 @@ class Enum
   end
 
   def each(&block)
-    @valorAbstracto.valores.each &block
+    @valorAbstracto.valores.each_value &block
   end
 
   def modificar(&block)
@@ -83,6 +83,10 @@ class ValorAbstracto
     enum_value = ValorDeEnum.new(@max_value, name, @instance)
     enum_value.singleton_class.class_exec &block unless block.nil?
     @valores[name] = enum_value
+
+    #Esto podria hacer con method_missing y el hash de valores,
+    # cuando lo hice no habia pensado la parte de polimorfismo
+    # con Enumerable
     @enum.define_singleton_method(name) do
       enum_value
     end

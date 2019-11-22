@@ -112,16 +112,16 @@ RSpec.describe "test de enums" do
 
     it "each" do
       list = []
-      EnumPolimorfico.each { |nombre, valor| list << valor }
+      EnumPolimorfico.each { |valor| list << valor }
       expect(list).to contain_exactly(EnumPolimorfico.primero, EnumPolimorfico.segundo, EnumPolimorfico.tercero, EnumPolimorfico.quinto)
     end
 
     it "all?" do
-      expect(EnumPolimorfico.all? {|nombre, valor| valor.valor < 5}).to be false
+      expect(EnumPolimorfico.all? {|valor| valor.valor < 5}).to be false
     end
 
     it "any?" do
-      expect(EnumPolimorfico.any? {|nombre, valor| valor.valor < 5}).to be true
+      expect(EnumPolimorfico.any? {|valor| valor.valor < 5}).to be true
     end
   end
 
